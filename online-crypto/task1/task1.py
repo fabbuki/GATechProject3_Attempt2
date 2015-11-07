@@ -81,11 +81,21 @@ def cbc_encrypt(message, key, iv):
 
     ##### EVERYTHING IS READY!!! #######
 
+    #step 1 is to XOR the first char plaintext with the IV
 
+    cipher_output = []
 
+    for i in range(len(bin_message_broken_and_padded)):
+        if i == 0:
+            initial_xor_message = logical_xor(bin_message_broken_and_padded[i], binary_iv_list)
+            cipher1 = myDes.des_encrypt(initial_xor_message)
+            cipher_output[i] = cipher1
+        else:
+            xor_before_cipher = logical_xor(bin_message_broken_and_padded[i], cipher_output[i-1])
+            cipher2 = myDes.des_encrypt(xor_before_cipher)
+            cipher_output[i] = cipher2
 
-
-    test()
+    #test()
     return ''
 
 def cbc_decrypt(message, key, iv):
