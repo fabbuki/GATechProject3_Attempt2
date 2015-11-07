@@ -1,13 +1,23 @@
 #!/usr/bin/python
 
+#my key range: 8080807580808080,808080757f7f7f7f
+
 import sys
+import binascii
 
 def enum_key(current):
     """Return the next key based on the current key as hex string.
 
+
     TODO: Implement the required functions.
     """
-    return "Your should implement this function! We are going to test it!"
+#convert to bits
+#split into 8 sections
+#kill highest bit in each
+
+
+    print next
+    return next
 
 def main(argv):
     if argv[0] == 'enum_key':
