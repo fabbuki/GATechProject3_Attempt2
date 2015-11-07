@@ -25,9 +25,27 @@ def test_des(key, message):
     c = k.des_encrypt(message)
     print bintohex("".join([str(e) for e in c]))
 
-#this performs a simple logical XOR in python 
+#this performs a simple logical XOR in python
 def logical_xor(str1, str2):
     return bool(str1) ^ bool(str2)
+
+def break_chunks(list1, n):
+    for i in xrange(0, len(list1), n):
+        yield list1[i:i+n]
+
+def break_list_64bit(list1):
+
+    #this will normalize the array to a special length which is a multiple of 64 bits, with special padding.
+    if len(list1)%64 == 0: #if it is a multiple of 64 bits, then I need to append a special thing.
+        list1 = list1 + [1] + [0]*63 #append 64 bits of dummy data
+    else:
+        list1 = list1 + [1] #add 1 as a special starter, because we can
+        while len(list1)%64 != 0:
+            list1 = list1 + [0]
+    number_of_64bit_chunks = len(list1)/64 #if this isn't an integer, we've screwed up badly
+    array_of_arrays = break_chunks(list1, number_of_64bit_chunks)
+
+    return array_of_arrays #now you have an array of arrays with each array as 64-bit length 1s and 0s.
 
 #assumes the lists are equal in length and all 1s or 0s
 def xor_list(list1, list2):
@@ -38,6 +56,7 @@ def xor_list(list1, list2):
     return my_xor_list
 
 def cbc_encrypt(message, key, iv):
+
     """
     Args:
       message: string, bytes, cannot be unicode
@@ -46,6 +65,26 @@ def cbc_encrypt(message, key, iv):
       ciphertext: string
     """
     # TODO: Add your code here.
+
+    bytekey = bytearray(key.decode("hex"))
+    myDes = des(bytekey)
+
+    #convert message to HEX
+    hex_message = binascii.hexlify(message)
+    binary_message = bin(int(hex_message, 16))[2:]
+    binary_message_list = list(binary_message) #it should now look like [1, 0, 1, 1, 0.... ]
+
+    bin_message_broken_and_padded = break_list_64bit(binary_message_list)
+
+    binary_iv = bin(int(iv, 16))[2:] #this converts the initialization vector into a binary list
+    binary_iv_list = list(binary_iv)
+
+    ##### EVERYTHING IS READY!!! #######
+
+
+
+
+
     test()
     return ''
 
