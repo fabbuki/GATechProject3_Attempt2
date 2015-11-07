@@ -29,6 +29,8 @@ def test():
 def test_des(key, message):
     k = des(key)
     c = k.des_encrypt(message)
+    print "DES returns type of string:"
+    print type(c)
     print bintohex("".join([str(e) for e in c]))
 
 #this performs a simple logical XOR in python
@@ -65,14 +67,6 @@ def break_list_64bit(list1):
 
     return array_of_arrays #now you have an array of arrays with each array as 64-bit length 1s and 0s.
 
-#assumes the lists are equal in length and all 1s or 0s
-def xor_list(list1, list2):
-    my_xor_list = []
-    for i in range(len(list1)):
-        my_xor_list[i] = logical_xor(list1[i], list2[i])
-
-    return my_xor_list
-
 def cbc_encrypt(message, key, iv):
 
     """
@@ -85,17 +79,17 @@ def cbc_encrypt(message, key, iv):
     # TODO: Add your code here.
     test()
 
-    bytekey = bytearray(key.decode("hex"))
+    bytekey = bytearray(key.decode("hex")) #convert from hex to bytearray
     print bytekey
     print type(bytekey)
-    string_bytekey = str(bytearray(bytekey))
+    string_bytekey = str(bytearray(bytekey)) #convert bytearray to a string, so we can use DES methods
     print string_bytekey
     print type(string_bytekey)
-    myDes = des(string_bytekey)
+    myDes = des(string_bytekey) #initialize the DES
 
     #convert message to HEX
-    hex_message = binascii.hexlify(message)
-    binary_message = bin(int(hex_message, 16))[2:]
+    hex_message = binascii.hexlify(message) #convert message to HEX
+    binary_message = bin(int(hex_message, 16))[2:] #convert HEX to binary
     binary_message_list = list(binary_message) #it should now look like [1, 0, 1, 1, 0.... ]
     binary_message_list = map(int, binary_message_list) #this should convert everything into an int
 
@@ -124,6 +118,7 @@ def cbc_encrypt(message, key, iv):
     #step 1 is to XOR the first char plaintext with the IV
 
     cipher_output = []
+    cipher_output_string = []
 
     for i in range(len(bin_message_broken_and_padded)):
         if i == 0:
@@ -132,14 +127,23 @@ def cbc_encrypt(message, key, iv):
             print type(initial_xor_message)
             print type(initial_xor_message[0])
             cipher1 = myDes.des_encrypt(initial_xor_message)
+            print type(cipher1)
+            # text_file = open("Output.txt", "w")
+            # text_file.write(cipher1)
+            # text_file.close
+            print "cipher length"
+            print len(cipher1)
             cipher_output.append(cipher1)
+            #cipher_output_byte.append(bintohex("".join([str(e) for e in cipher1])).decode("hex")) #just following the way test_des does it
         else:
             xor_before_cipher = logical_xor(bin_message_broken_and_padded[i], cipher_output[i-1])
             cipher2 = myDes.des_encrypt(xor_before_cipher)
             cipher_output.append(cipher2)
+            #cipher_output_byte.append(bintohex("".join([str(e) for e in cipher2])).decode("hex")) #yolo
+    print "HELLO HELLO"
 
-    test()
-    return ''.join(str(x) for x in cipher_output)
+
+    return cipher_output
 
 def cbc_decrypt(message, key, iv):
     """
