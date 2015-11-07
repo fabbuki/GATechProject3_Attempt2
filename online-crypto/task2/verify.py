@@ -22,6 +22,8 @@ def verify(mode, input, expect, language):
            print "Passes the test on input: %s, %s, %s" % (
                 mode, input, expect)
         else:
+            print output
+            print expect
             print "Fails the test on input: %s, %s, %s" % (
                 mode, input, expect)
     except:
