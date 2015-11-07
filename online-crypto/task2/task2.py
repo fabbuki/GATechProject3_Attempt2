@@ -12,6 +12,7 @@ def enum_key(current):
     TODO: Implement the required functions.
     """
 #convert to bits
+    binary_current = (bin(int(current, 16))[2:]).zfill(64)
 #split into 8 sections
 #kill highest bit in each
 
