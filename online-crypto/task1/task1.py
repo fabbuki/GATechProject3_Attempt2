@@ -25,6 +25,18 @@ def test_des(key, message):
     c = k.des_encrypt(message)
     print bintohex("".join([str(e) for e in c]))
 
+#this performs a simple logical XOR in python 
+def logical_xor(str1, str2):
+    return bool(str1) ^ bool(str2)
+
+#assumes the lists are equal in length and all 1s or 0s
+def xor_list(list1, list2):
+    my_xor_list = []
+    for i in range(len(list1)):
+        my_xor_list[i] = logical_xor(list1[i], list2[i])
+
+    return my_xor_list
+
 def cbc_encrypt(message, key, iv):
     """
     Args:
