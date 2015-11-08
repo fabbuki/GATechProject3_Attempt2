@@ -11,15 +11,15 @@ def bintohex(s):
 def test():
     key1 = b"\0\0\0\0\0\0\0\0"
     key2 = b"\0\0\0\0\0\0\0\2"
-    print type(key1)
-    print key1
+    # print type(key1)
+    # print key1
     message1 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     message2 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
 
-    print "message 1 contains type of"
-    print type(message1[0])
+    # print "message 1 contains type of"
+    # print type(message1[0])
 
     test_des(key1, message1)
     test_des(key1, message2)
@@ -29,19 +29,19 @@ def test():
 def test_des(key, message):
     k = des(key)
     c = k.des_encrypt(message)
-    print "DES returns type of string:"
-    print type(c)
-    print bintohex("".join([str(e) for e in c]))
+    # print "DES returns type of string:"
+    # print type(c)
+    # print bintohex("".join([str(e) for e in c]))
 
 #this performs a simple logical XOR in python
 def logical_xor(str1, str2):
     mylogicalarray = []
 
-    print "LOGICAL XOR"
-    print str1
-    print len(str1)
-    print str2
-    print len(str2)
+    # print "LOGICAL XOR"
+    # print str1
+    # print len(str1)
+    # print str2
+    # print len(str2)
 
     for i in range(len(str1)):
         mylogicalarray.append(bool(str1[i]) ^ bool(str2[i]))
@@ -63,7 +63,7 @@ def break_list_64bit(list1):
     #number_of_64bit_chunks = len(list1)/64 #if this isn't an integer, we've screwed up badly
     #print number_of_64bit_chunks
     array_of_arrays = list(break_chunks(list1, 64))
-    print type(array_of_arrays)
+    #print type(array_of_arrays)
 
     return array_of_arrays #now you have an array of arrays with each array as 64-bit length 1s and 0s.
 
@@ -77,15 +77,15 @@ def cbc_encrypt(message, key, iv):
       ciphertext: string
     """
     # TODO: Add your code here.
-    test()
+    #test()
 
-    bytekey = bytearray(key.decode("hex")) #convert from hex to bytearray
-    print bytekey
-    print type(bytekey)
-    string_bytekey = str(bytearray(bytekey)) #convert bytearray to a string, so we can use DES methods
-    print string_bytekey
-    print type(string_bytekey)
-    myDes = des(string_bytekey) #initialize the DES
+    bytekey = binascii.a2b_hex(key) #convert from hex to bytes
+    # print bytekey
+    # print type(bytekey)
+    #string_bytekey = str(bytearray(bytekey)) #convert bytearray to a string, so we can use DES methods
+    # print string_bytekey
+    # print type(string_bytekey)
+    myDes = des(bytekey) #initialize the DES
 
     # #convert message to HEX
     # hex_message = binascii.hexlify(message) #convert message to HEX
@@ -95,33 +95,34 @@ def cbc_encrypt(message, key, iv):
     binary_message = []
     for i in range(len(message)):
         binary_representation_of_character = format(ord(message[i]), 'b').zfill(8) #this should fill it in to 8 bits
-        print binary_representation_of_character
+        # print binary_representation_of_character
         binary_message.append(binary_representation_of_character)
 
-    binary_message = ''.join(binary_message)
+    binary_message = ''.join(binary_message) #merge it all into one nice string
 
     binary_message_list = list(binary_message) #it should now look like [1, 0, 1, 1, 0.... ]
     binary_message_list = map(int, binary_message_list) #this should convert everything into an int
 
-    print "message broken and padded:"
+    # print "message broken and padded:"
     bin_message_broken_and_padded = break_list_64bit(binary_message_list)
-    print type(bin_message_broken_and_padded)
-    print bin_message_broken_and_padded
+    # print type(bin_message_broken_and_padded)
+    # print bin_message_broken_and_padded
 
-    binary_iv = (bin(int(iv, 16))[2:]).zfill(64) #this converts the initialization vector into a binary list and adds trailing 0s
-    print binary_iv
+    binary_iv = (bin(int(iv, 16))[2:]).zfill(64) #this converts the initialization vector into a binary list and
+    # adds leading 0s to make it 64-bit
+    # print binary_iv
 
     binary_iv_list = list(binary_iv)
     binary_iv_list = map(int, binary_iv_list) #convert all elements to int so I can actually xor stuff
 
     #binary_iv_list = [0] + binary_iv_list #jenky padding method to make it a 64 bit array
-    print binary_iv_list
+    # print binary_iv_list
 
-    #sanity check
-    print "binary iv list type is"
-    print type(binary_iv_list[0])
-    print "message list type is"
-    print type(binary_message_list[0])
+    # #sanity check
+    # print "binary iv list type is"
+    # print type(binary_iv_list[0])
+    # print "message list type is"
+    # print type(binary_message_list[0])
 
     ##### EVERYTHING IS READY!!! #######
 
@@ -133,16 +134,16 @@ def cbc_encrypt(message, key, iv):
     for i in range(len(bin_message_broken_and_padded)):
         if i == 0:
             initial_xor_message = logical_xor(bin_message_broken_and_padded[i], binary_iv_list)
-            print initial_xor_message
-            print type(initial_xor_message)
-            print type(initial_xor_message[0])
+            # print initial_xor_message
+            # print type(initial_xor_message)
+            # print type(initial_xor_message[0])
             cipher1 = myDes.des_encrypt(initial_xor_message)
-            print type(cipher1)
+            # print type(cipher1)
             # text_file = open("Output.txt", "w")
             # text_file.write(cipher1)
             # text_file.close
-            print "cipher length"
-            print len(cipher1)
+            # print "cipher length"
+            # print len(cipher1)
             cipher_output.append(cipher1)
             cipher_output_string.append("".join(str(x) for x in cipher1))
             #cipher_output_byte.append(bintohex("".join([str(e) for e in cipher1])).decode("hex")) #just following the way test_des does it
@@ -152,13 +153,17 @@ def cbc_encrypt(message, key, iv):
             cipher_output.append(cipher2)
             cipher_output_string.append("".join(str(x) for x in cipher2))
             #cipher_output_byte.append(bintohex("".join([str(e) for e in cipher2])).decode("hex")) #yolo
-    print "HELLO HELLO"
-
-    print type(cipher_output)
-    print type(cipher_output[1])
+    # print "HELLO HELLO"
+    #
+    # print type(cipher_output)
+    # print type(cipher_output[1])
     cipher_output = "".join(cipher_output_string) #unify the strings I think this works
 
-    print cipher_output
+    # print cipher_output
+
+    f = open('Output.txt', 'w')
+    f.write(cipher_output)
+    f.close()
 
     return cipher_output
 
