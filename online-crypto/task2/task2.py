@@ -4,6 +4,8 @@
 
 import sys
 import binascii
+import time
+import des_wrapper
 
 def break_chunks(list1, n):
     for i in xrange(0, len(list1), n):
@@ -62,12 +64,61 @@ def enum_key(current):
 
     return next_hex
 
+def convert_to_binary(key):
+
+    binary_current = (bin(int(key, 16))[2:]).zfill(64)
+    binary_current = list(binary_current)
+    binary_current = map(int,binary_current)
+
+    return binary_current
+
 def main(argv):
     if argv[0] == 'enum_key':
         print enum_key(argv[1])
     elif argv[0] == 'crack':
-        """TODO: Add your own code and do whatever you do.
-        """
+
+        f = open('ciphertext', 'r')
+        ciphertext =  f.read()
+
+        g = open('plaintext', 'r')
+        plaintext = g.read()
+
+        binary_message = bin(int(binascii.hexlify(plaintext),16))[2:].zfill(64)
+        binary_message_list = map(int,list(binary_message))
+
+        print binary_message_list
+
+        #starter key
+        start = time.time()
+
+        currentKey = '8080807580808080' #starter key
+        binary_current = convert_to_binary(currentKey)
+        test = des_wrapper.des_encrypt(binary_current, binary_message_list)
+        number_of_tries = 1
+
+        print test == ciphertext
+
+        # present_key_300thousand = currentKey
+        # for i in range(0,30000,1):
+        #     present_key_300thousand = enum_key(present_key_300thousand)
+
+        while currentKey != '808080757f7f7f7f':
+            currentKey = enum_key(currentKey)
+            binary_current = convert_to_binary(currentKey)
+            test = des_wrapper.des_encrypt(binary_current, binary_message_list)
+            number_of_tries += 1
+            if test == ciphertext:
+                print "I FOUND IT"
+                print currentKey
+                print "The magic key precedes this message"
+                break
+
+        end = time.time()
+
+        print number_of_tries
+        print "Consumed CPU time=%f" % (end - start)
+        print "Average number per minute = %f" % (number_of_tries/(end-start)*60)
+
     else:
         raise Exception("Wrong mode!")
 
