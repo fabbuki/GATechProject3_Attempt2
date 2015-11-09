@@ -81,7 +81,7 @@ def main(argv):
         print enum_key(argv[1])
     elif argv[0] == 'crack':
 
-        f = open('ciphertext_student_247.txt', 'r')
+        f = open('ciphertext', 'r')
         ciphertext =  f.read()
 
         g = open('plaintext', 'r')
@@ -95,7 +95,7 @@ def main(argv):
         #starter key
         start = time.time()
 
-        currentKey = '8080017580808080' #starter key
+        currentKey = '8080807580808080' #starter key
         binary_current = convert_to_binary(currentKey)
         test = des_wrapper.des_encrypt(binary_current, binary_message_list)
         number_of_tries = 1
@@ -106,17 +106,17 @@ def main(argv):
         # for i in range(0,30000,1):
         #     present_key_300thousand = enum_key(present_key_300thousand)
 
-        while currentKey != '8080017580808013':
+        while currentKey != '808080757f7f7f7f':
             currentKey = enum_key(currentKey)
             binary_current = convert_to_binary(currentKey)
             test = des_wrapper.des_encrypt(binary_current, binary_message_list)
             test = bit2str(test)
             number_of_tries += 1
-            print test
+            #print test
             if test == ciphertext:
-                print "I FOUND IT"
+                print "I FOUND IT (look below)"
                 print currentKey
-                print "The magic key precedes this message"
+                print "The correct key is  above ^^^^^^^"
                 break
 
         end = time.time()
