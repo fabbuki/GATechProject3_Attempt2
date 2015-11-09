@@ -8,6 +8,12 @@ def bintohex(s):
     t = ''.join(chr(int(s[i:i+8], 2)) for i in xrange(0, len(s), 8))
     return binascii.hexlify(t).upper()
 
+#binary to str converter helper
+
+def bit2str(s):
+    t = ''.join(chr(int(s[i:i+8], 2)) for i in xrange(0, len(s), 8))
+    return t
+
 def test():
     key1 = b"\0\0\0\0\0\0\0\0"
     key2 = b"\0\0\0\0\0\0\0\2"
@@ -161,11 +167,13 @@ def cbc_encrypt(message, key, iv):
 
     # print cipher_output
 
+    cipher_output_garbled = bit2str(cipher_output)
+
     f = open('Output.txt', 'w')
-    f.write(cipher_output)
+    f.write(cipher_output_garbled)
     f.close()
 
-    return cipher_output
+    return cipher_output_garbled
 
 def cbc_decrypt(message, key, iv):
     """
