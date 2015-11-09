@@ -1,0 +1,4 @@
+1. Start Key:  8080017580808080
+2. ENCRYPTION KEY INDEX: 19
+3. ENCRYPTION KEY: 8080017580808013
+4. Cipher File:  ciphertext_student_247.txt

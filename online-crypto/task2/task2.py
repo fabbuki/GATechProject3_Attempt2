@@ -94,7 +94,7 @@ def main(argv):
         start = time.time() #start the count
 
         #first try (I know, this violates the DON'T-REPEAT-YOURSELF rule)
-        currentKey = '8080017580808080' #starter key
+        currentKey = '8080807580808080'                     #starter key for Nick Lee
         binary_current = convert_to_binary(currentKey)
         test = des_wrapper.des_encrypt(binary_current, binary_message_list)
         test = bit2str(test)
@@ -103,7 +103,7 @@ def main(argv):
         if test == ciphertext:
             print "Found it on the first try! The key is: " + currentKey
         else:
-            while currentKey != '8080017580808094':
+            while currentKey != '808080757f7f7f7f':         #end key for Nick Lee
                 currentKey = enum_key(currentKey)
                 binary_current = convert_to_binary(currentKey)
                 test = des_wrapper.des_encrypt(binary_current, binary_message_list)
