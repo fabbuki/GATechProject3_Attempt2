@@ -81,7 +81,8 @@ def main(argv):
         print enum_key(argv[1])
     elif argv[0] == 'crack':
 
-        f = open('ciphertext', 'r')
+        #load in my ciphertext and plaintext
+        f = open('ciphertext_student_247.txt', 'r')
         ciphertext =  f.read()
 
         g = open('plaintext', 'r')
@@ -90,38 +91,30 @@ def main(argv):
         binary_message = bin(int(binascii.hexlify(plaintext),16))[2:].zfill(64)
         binary_message_list = map(int,list(binary_message))
 
-        print binary_message_list
+        start = time.time() #start the count
 
-        #starter key
-        start = time.time()
-
-        currentKey = '8080807580808080' #starter key
+        #first try (I know, this violates the DON'T-REPEAT-YOURSELF rule)
+        currentKey = '8080017580808080' #starter key
         binary_current = convert_to_binary(currentKey)
         test = des_wrapper.des_encrypt(binary_current, binary_message_list)
+        test = bit2str(test)
         number_of_tries = 1
 
-        #print test == ciphertext
-
-        # present_key_300thousand = currentKey
-        # for i in range(0,30000,1):
-        #     present_key_300thousand = enum_key(present_key_300thousand)
-
-        while currentKey != '808080757f7f7f7f':
-            currentKey = enum_key(currentKey)
-            binary_current = convert_to_binary(currentKey)
-            test = des_wrapper.des_encrypt(binary_current, binary_message_list)
-            test = bit2str(test)
-            number_of_tries += 1
-            #print test
-            if test == ciphertext:
-                print "I FOUND IT (look below)"
-                print currentKey
-                print "The correct key is  above ^^^^^^^"
-                break
+        if test == ciphertext:
+            print "Found it on the first try! The key is: " + currentKey
+        else:
+            while currentKey != '8080017580808094':
+                currentKey = enum_key(currentKey)
+                binary_current = convert_to_binary(currentKey)
+                test = des_wrapper.des_encrypt(binary_current, binary_message_list)
+                test = bit2str(test)
+                number_of_tries += 1
+                if test == ciphertext:
+                    print "Found it after " + str(number_of_tries) + " tries. The key is: " + currentKey
+                    break
 
         end = time.time()
 
-        print number_of_tries
         print "Consumed CPU time=%f" % (end - start)
         print "Average number per minute = %f" % (number_of_tries/(end-start)*60)
 
