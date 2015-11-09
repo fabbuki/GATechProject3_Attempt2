@@ -8,13 +8,15 @@ def bintohex(s):
     t = ''.join(chr(int(s[i:i+8], 2)) for i in xrange(0, len(s), 8))
     return binascii.hexlify(t).upper()
 
-#binary to str converter helper
-
 def bit2str(s):
+    '''
+    :param s: Input your string of 1s and 0s (must be a string)
+    :return: Your binary, but expressed as a character string
+    This will often return a garbled result if you are encrypting.
+    This will (hopefully) return an English result if you are decrypting
+    '''
     t = ''.join(chr(int(s[i:i+8], 2)) for i in xrange(0, len(s), 8))
     return t
-
-
 
 def writetodebugger(s):
     f = open('Output.txt', 'a')
@@ -34,6 +36,11 @@ def boolean_to_binary(data):
     return integer_array
 
 def str2binaryarray(s):
+    '''
+
+    :param s: Input your plaintext message
+    :return: an array of 1s and 0s (integers) which represent your characters, with each character getting 8 bits
+    '''
     binary_message = []
     for i in range(len(s)):
         binary_representation_of_character = format(ord(s[i]), 'b').zfill(8) #this should fill it in to 8 bits
@@ -74,14 +81,13 @@ def test_des(key, message):
 
 #this performs a simple logical XOR in python
 def logical_xor(str1, str2):
+    '''
+
+    :param str1: Array of 1s and 0s (must be integers)
+    :param str2: Array of 1s and 0s (must be integers, and also same length)
+    :return: XOR'd result, as an array of 1s and 0s (integers)
+    '''
     mylogicalarray = []
-
-    # print "LOGICAL XOR"
-    # print str1
-    # print len(str1)
-    # print str2
-    # print len(str2)
-
     for i in range(len(str1)):
         mylogicalarray.append(bool(str1[i]) ^ bool(str2[i]))
     return mylogicalarray
@@ -91,6 +97,11 @@ def break_chunks(list1, n):
         yield list1[i:i+n]
 
 def break_list_64bit(list1):
+    '''
+
+    :param list1: Provide this method with your array of 1s and 0s (must be integers)
+    :return: Returns an array of arrays, with each array holding 64 bits, and also proper padding applied for CBC
+    '''
 
     #this will normalize the array to a special length which is a multiple of 64 bits, with special padding.
     if len(list1)%64 == 0: #if it is a multiple of 64 bits, then I need to append a special thing.
@@ -99,10 +110,8 @@ def break_list_64bit(list1):
         list1 = list1 + [1] #add 1 as a special starter, because we can
         while len(list1)%64 != 0:
             list1 = list1 + [0]
-    #number_of_64bit_chunks = len(list1)/64 #if this isn't an integer, we've screwed up badly
-    #print number_of_64bit_chunks
     array_of_arrays = list(break_chunks(list1, 64))
-    #print type(array_of_arrays)
+
 
     return array_of_arrays #now you have an array of arrays with each array as 64-bit length 1s and 0s.
 
@@ -116,57 +125,26 @@ def cbc_encrypt(message, key, iv):
       ciphertext: string
     """
     # TODO: Add your code here.
-    #test()
 
     bytekey = binascii.a2b_hex(key) #convert from hex to bytes
     myDes = des(bytekey) #initialize the DES
 
-    # #convert message to HEX
-    # hex_message = binascii.hexlify(message) #convert message to HEX
-    # binary_message = bin(int(hex_message, 16))[2:] #convert HEX to binary
-
-    #take in message, and go character by character and create 8-bit binary and then glue shit together
-    # binary_message = []
-    # for i in range(len(message)):
-    #     binary_representation_of_character = format(ord(message[i]), 'b').zfill(8) #this should fill it in to 8 bits
-    #     # print binary_representation_of_character
-    #     binary_message.append(binary_representation_of_character)
-    #
-    # binary_message = ''.join(binary_message) #merge it all into one nice string
-    #
-    # binary_message_list = list(binary_message) #it should now look like [1, 0, 1, 1, 0.... ]
-    # binary_message_list = map(int, binary_message_list) #this should convert everything into an int
-
     binary_message_list = str2binaryarray(message)
-
-    # print "message broken and padded:"
     bin_message_broken_and_padded = break_list_64bit(binary_message_list)
-    # print type(bin_message_broken_and_padded)
-    # print bin_message_broken_and_padded
+
 
     binary_iv = (bin(int(iv, 16))[2:]).zfill(64) #this converts the initialization vector into a binary list and
     # adds leading 0s to make it 64-bit
-    # print binary_iv
 
-    binary_iv_list = list(binary_iv)
+    binary_iv_list = list(binary_iv) #convert it into a list
     binary_iv_list = map(int, binary_iv_list) #convert all elements to int so I can actually xor stuff
 
-    #binary_iv_list = [0] + binary_iv_list #jenky padding method to make it a 64 bit array
-    # print binary_iv_list
-
-    # #sanity check
-    # print "binary iv list type is"
-    # print type(binary_iv_list[0])
-    # print "message list type is"
-    # print type(binary_message_list[0])
-
     ##### EVERYTHING IS READY!!! #######
-
-    #step 1 is to XOR the first char plaintext with the IV
 
     cipher_output = []
     cipher_output_string = []
 
+    #this is the CBC implementation
     for i in range(len(bin_message_broken_and_padded)):
         if i == 0:
             initial_xor_message = logical_xor(bin_message_broken_and_padded[i], binary_iv_list)
@@ -180,13 +158,8 @@ def cbc_encrypt(message, key, iv):
             cipher_output_string.append("".join(str(x) for x in cipher2))
     cipher_output = "".join(cipher_output_string) #unify the strings I think this works
 
-    # print cipher_output
-
+    #The cipher output is going to look like nonsense. We must convert the bits to the str representation
     cipher_output_garbled = bit2str(cipher_output)
-
-    # f = open('Output.txt', 'w')
-    # f.write(cipher_output_garbled)
-    # f.close()
 
     return cipher_output_garbled
 
@@ -206,7 +179,6 @@ def cbc_decrypt(message, key, iv):
 
     binary_iv = (bin(int(iv, 16))[2:]).zfill(64) #this converts the initialization vector into a binary list and
     # adds leading 0s to make it 64-bit
-    # print binary_iv
 
     binary_iv_list = list(binary_iv)
     binary_iv_list = map(int, binary_iv_list) #convert all elements to int so I can actually xor stuff
@@ -220,6 +192,7 @@ def cbc_decrypt(message, key, iv):
     cipher_input = []
     plaintext_output_string = []
 
+    #this is the CBC implementation
     for i in range(len(binary_message_64bit_array)):
         if i == 0:
             cipher_input.append(binary_message_64bit_array[i])
@@ -229,14 +202,12 @@ def cbc_decrypt(message, key, iv):
             integer_array_of_boolean = boolean_to_binary(plaintext1_post_xor)
 
             plaintext_output_string.append("".join(str(x) for x in integer_array_of_boolean))
-            #print plaintext_output_string
         else:
             cipher_input.append(binary_message_64bit_array[i])
             plaintext1_pre_xor = myDes.des_decrypt(binary_message_64bit_array[i])
             plaintext1_post_xor = logical_xor(cipher_input[i-1], plaintext1_pre_xor)
             integer_array_of_boolean = boolean_to_binary(plaintext1_post_xor)
             plaintext_output_string.append("".join(str(x) for x in integer_array_of_boolean))
-            #print plaintext_output_string
 
     plaintext_output_string = "".join(plaintext_output_string) #unify the strings I think this works
 
@@ -249,19 +220,10 @@ def cbc_decrypt(message, key, iv):
             plaintext_output_string = plaintext_output_string[:-1]
             deleted_a_one = True
 
-    #writetodebugger(plaintext_output_string)
-
-    #writetodebugger(str(len(plaintext_output_string)))
-
+    #This will translate our bits back into language that humans can (hopefully) understand
     plaintext_output_cleaned = bit2str(plaintext_output_string)
 
-    #writetodebugger(plaintext_output_cleaned)
-    #print plaintext_output_cleaned
-
-    #writetodebugger(plaintext_output_cleaned)
-
-
-    return str(plaintext_output_cleaned)
+    return plaintext_output_cleaned
 
 def main(argv):
     if len(argv) != 5:
