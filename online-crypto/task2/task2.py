@@ -11,6 +11,10 @@ def break_chunks(list1, n):
     for i in xrange(0, len(list1), n):
         yield list1[i:i+n]
 
+def bit2str(s):
+    t = ''.join(chr(int(s[i:i+8], 2)) for i in xrange(0, len(s), 8))
+    return t
+
 def enum_key(current):
     """Return the next key based on the current key as hex string.
 
@@ -106,6 +110,7 @@ def main(argv):
             currentKey = enum_key(currentKey)
             binary_current = convert_to_binary(currentKey)
             test = des_wrapper.des_encrypt(binary_current, binary_message_list)
+            test = bit2str(test)
             number_of_tries += 1
             print test
             if test == ciphertext:
